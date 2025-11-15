@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA 2K: The Microtransaction Experience (Enhanced)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ff6b35;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card.warning {
+            border-color: #ff9f43;
+            animation: pulse 2s infinite;
+        }
+
+        .stat-card.danger {
+            border-color: #ee5a6f;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        .stat-value.positive {
+            color: #26de81;
+        }
+
+        .stat-value.negative {
+            color: #ee5a6f;
+        }
+
+        .story-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .story-text {
+            line-height: 1.8;
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        .alert-box {
+            background: rgba(238, 90, 111, 0.2);
+            border: 2px solid #ee5a6f;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .alert-box.warning {
+            background: rgba(255, 159, 67, 0.2);
+            border-color: #ff9f43;
+        }
+
+        .alert-box.info {
+            background: rgba(38, 222, 129, 0.2);
+            border-color: #26de81;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-section-title {
+            font-size: 1.2em;
+            color: #ff6b35;
+            margin: 20px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #666 0%, #555 100%);
+        }
+
+        .choice-btn:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .choice-btn.grind {
+            background: linear-gradient(135deg, #4834df 0%, #6c5ce7 100%);
+            box-shadow: 0 4px 15px rgba(72, 52, 223, 0.3);
+        }
+
+        .choice-btn.grind:not(:disabled):hover {
+            box-shadow: 0 6px 20px rgba(72, 52, 223, 0.5);
+        }
+
+        .choice-btn.work {
+            background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+            box-shadow: 0 4px 15px rgba(38, 222, 129, 0.3);
+        }
+
+        .choice-btn.work:not(:disabled):hover {
+            box-shadow: 0 6px 20px rgba(38, 222, 129, 0.5);
+        }
+
+        .choice-description {
+            display: block;
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .fact-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            transition: transform 0.3s ease;
+        }
+
+        .fact-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .fact-popup h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            color: #ffd700;
+        }
+
+        .fact-popup p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .fact-popup button {
+            background: #fff;
+            color: #764ba2;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .fact-popup button:hover {
+            transform: scale(1.05);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .ending {
+            background: rgba(255, 107, 53, 0.2);
+            border: 2px solid #ff6b35;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .ending h2 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .ending-stats {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .ending-stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 153, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 153, 255, 0.5);
+        }
+
+        .vc-packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .vc-package {
+            background: rgba(255, 107, 53, 0.1);
+            border: 2px solid #ff6b35;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .vc-package:hover:not(.disabled) {
+            background: rgba(255, 107, 53, 0.3);
+            transform: scale(1.05);
+        }
+
+        .vc-package.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #666;
+        }
+
+        .vc-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .vc-cost {
+            font-size: 1em;
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+
+        .vc-gain {
+            font-size: 0.85em;
+            color: #26de81;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .vc-packages {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="fact-popup" id="factPopup">
+        <h3>💰 NBA 2K Fact</h3>
+        <p id="factText"></p>
+        <button onclick="closeFact()">Continue</button>
+    </div>
+
+    <div class="container" id="gameContainer">
+        <h1>NBA 2K: The Microtransaction Experience</h1>
+        <div class="subtitle">Enhanced Interactive Simulation</div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card" id="budgetCard">
+                <div class="stat-label">Budget</div>
+                <div class="stat-value" id="budget">$130</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value" id="moneySpent">$70</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">VC Owned</div>
+                <div class="stat-value positive" id="vcOwned">0</div>
+            </div>
+            <div class="stat-card" id="overallCard">
+                <div class="stat-label">Your Overall</div>
+                <div class="stat-value" id="overall">60</div>
+            </div>
+            <div class="stat-card" id="opponentCard">
+                <div class="stat-label">Avg Opponent</div>
+                <div class="stat-value negative" id="avgOpponent">75</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Hours Played</div>
+                <div class="stat-value" id="hoursPlayed">0</div>
+            </div>
+        </div>
+
+        <div id="gameContent">
+            <div class="story-section">
+                <div class="story-text" id="storyText"></div>
+            </div>
+            <div class="choices" id="choices"></div>
+        </div>
+    </div>
+
+    <script>
+        const gameState = {
+            budget: 130,
+            moneySpent: 70,
+            vcOwned: 0,
+            overall: 60,
+            avgOpponent: 75,
+            hoursPlayed: 0,
+            totalActions: 0,
+            grindSessions: 0,
+            vcPurchases: 0,
+            workSessions: 0,
+            currentScene: 'start',
+            burnoutLevel: 0,
+            debtWarningShown: false,
+            frustrationLevel: 0
+        };
+
+        const vcPackages = [
+            { vc: 5000, cost: 5, ovrGain: 1, name: "Starter Pack" },
+            { vc: 15000, cost: 15, ovrGain: 3, name: "Small Boost" },
+            { vc: 35000, cost: 35, ovrGain: 7, name: "Medium Pack" },
+            { vc: 75000, cost: 65, ovrGain: 15, name: "Large Pack" },
+            { vc: 200000, cost: 150, ovrGain: 20, name: "Mega Pack" },
+            { vc: 450000, cost: 300, ovrGain: 39, name: "Ultimate Pack" }
+        ];
+
+        const facts = [
+            "NBA 2K21 sold approximately 8 million copies, generating over $560 million in initial sales alone.",
+            "NBA 2K22 broke records with over 10 million copies sold in its first year.",
+            "NBA 2K23 sold more than 11 million copies, continuing the franchise's dominance.",
+            "NBA 2K24 exceeded 11 million copies sold, with microtransactions adding hundreds of millions in revenue.",
+            "NBA 2K25 sold over 11.5 million copies, with VC purchases accounting for a significant portion of Take-Two's revenue.",
+            "The NBA 2K franchise has generated over $1 billion in revenue from microtransactions in recent years.",
+            "It can take 150+ hours of grinding to max out a MyPlayer without spending extra money on VC.",
+            "Studies show that 70% of NBA 2K players purchase VC at least once, with 30% spending over $100 beyond the base game.",
+            "The average NBA 2K player spends $80-120 on VC during the game's lifecycle.",
+            "Virtual Currency (VC) can be used across multiple game modes, encouraging larger purchases.",
+            "Top-tier competitive players often spend $200+ to maximize their builds immediately."
+        ];
+
+        let usedFacts = [];
+
+        function updateStats() {
+            document.getElementById('budget').textContent = `$${gameState.budget}`;
+            document.getElementById('moneySpent').textContent = `$${gameState.moneySpent}`;
+            document.getElementById('vcOwned').textContent = gameState.vcOwned.toLocaleString();
+            document.getElementById('overall').textContent = gameState.overall;
+            document.getElementById('avgOpponent').textContent = gameState.avgOpponent;
+            document.getElementById('hoursPlayed').textContent = gameState.hoursPlayed;
+
+            // Update card warnings
+            const budgetCard = document.getElementById('budgetCard');
+            if (gameState.budget < 0) {
+                budgetCard.classList.add('danger');
+            } else {
+                budgetCard.classList.remove('danger', 'warning');
+            }
+
+            const overallCard = document.getElementById('overallCard');
+            const opponentCard = document.getElementById('opponentCard');
+            const ovrDiff = gameState.avgOpponent - gameState.overall;
+            
+            if (ovrDiff >= 20) {
+                overallCard.classList.add('danger');
+                opponentCard.classList.add('danger');
+            } else if (ovrDiff >= 10) {
+                overallCard.classList.add('warning');
+                opponentCard.classList.add('warning');
+                overallCard.classList.remove('danger');
+                opponentCard.classList.remove('danger');
+            } else {
+                overallCard.classList.remove('danger', 'warning');
+                opponentCard.classList.remove('danger', 'warning');
+            }
+        }
+
+        function showFact() {
+            if (usedFacts.length === facts.length) {
+                usedFacts = [];
+            }
+            
+            let availableFacts = facts.filter((f, i) => !usedFacts.includes(i));
+            let randomIndex = Math.floor(Math.random() * availableFacts.length);
+            let factIndex = facts.indexOf(availableFacts[randomIndex]);
+            usedFacts.push(factIndex);
+
+            document.getElementById('factText').textContent = facts[factIndex];
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('factPopup').classList.add('show');
+        }
+
+        function closeFact() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('factPopup').classList.remove('show');
+        }
+
+        function increaseOpponentOVR(amount = 5) {
+            gameState.avgOpponent += amount;
+            if (gameState.avgOpponent > 99) gameState.avgOpponent = 99;
+        }
+
+        function showMainChoices() {
+            const ovrDiff = gameState.avgOpponent - gameState.overall;
+            let storyText = `You're at ${gameState.overall} overall. The average player in the Park is ${gameState.avgOpponent} overall.`;
+            
+            if (ovrDiff >= 20) {
+                storyText += ` <div class="alert-box">⚠️ You're getting DESTROYED. Players are quitting when they see your rating. You can barely score.</div>`;
+            } else if (ovrDiff >= 10) {
+                storyText += ` <div class="alert-box warning">⚠️ You're struggling to compete. Every game feels like an uphill battle.</div>`;
+            } else if (ovrDiff <= -5) {
+                storyText += ` <div class="alert-box info">✓ You're competitive! Games feel fair and fun.</div>`;
+            } else {
+                storyText += ` You're holding your own, but could be better.`;
+            }
+
+            if (gameState.budget < 0) {
+                storyText += ` <div class="alert-box">💳 WARNING: You're in debt! You owe $${Math.abs(gameState.budget)}.</div>`;
+            }
+
+            if (gameState.burnoutLevel >= 50) {
+                storyText += ` <div class="alert-box">😫 You're feeling burned out. The grind is taking its toll.</div>`;
+            }
+
+            document.getElementById('storyText').innerHTML = storyText;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '<div class="choice-section-title">What do you do?</div>';
+
+            // Buy VC button
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'choice-btn';
+            buyBtn.innerHTML = '💳 Buy VC <span class="choice-description">Instant upgrades with real money</span>';
+            buyBtn.onclick = () => showVCShop();
+            choicesDiv.appendChild(buyBtn);
+
+            // Grind button
+            const grindBtn = document.createElement('button');
+            grindBtn.className = 'choice-btn grind';
+            grindBtn.innerHTML = '🎮 Grind Games <span class="choice-description">Earn VC slowly (+0.5 OVR per hour, ~3,000 VC/hr)</span>';
+            grindBtn.onclick = () => grindGames();
+            choicesDiv.appendChild(grindBtn);
+
+            // Work button
+            const workBtn = document.createElement('button');
+            workBtn.className = 'choice-btn work';
+            workBtn.innerHTML = '💼 Earn Real Money <span class="choice-description">+$50 budget, but others level up (+5 OVR to opponents)</span>';
+            workBtn.onclick = () => earnMoney();
+            choicesDiv.appendChild(workBtn);
+
+            // Check progress button
+            if (gameState.totalActions >= 3) {
+                const checkBtn = document.createElement('button');
+                checkBtn.className = 'choice-btn';
+                checkBtn.style.background = 'linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)';
+                checkBtn.innerHTML = '📊 Evaluate Your Journey <span class="choice-description">See where you stand and decide if you\'re done</span>';
+                checkBtn.onclick = () => evaluateJourney();
+                choicesDiv.appendChild(checkBtn);
+            }
+        }
+
+        function showVCShop() {
+            let storyText = `<h3>💰 VC Store</h3><p>Select a package to purchase. Your current budget: <strong>$${gameState.budget}</strong></p>`;
+            
+            document.getElementById('storyText').innerHTML = storyText;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '<div class="vc-packages" id="vcPackages"></div>';
+
+            const packagesDiv = document.getElementById('vcPackages');
+
+            vcPackages.forEach((pkg, index) => {
+                const pkgDiv = document.createElement('div');
+                pkgDiv.className = 'vc-package';
+                
+                if (gameState.budget < pkg.cost) {
+                    pkgDiv.classList.add('disabled');
+                }
+
+                pkgDiv.innerHTML = `
+                    <div class="vc-amount">${pkg.vc.toLocaleString()} VC</div>
+                    <div class="vc-cost">$${pkg.cost}</div>
+                    <div class="vc-gain">+${pkg.ovrGain} OVR</div>
+                `;
+
+                if (gameState.budget >= pkg.cost) {
+                    pkgDiv.onclick = () => buyVC(index);
+                }
+
+                packagesDiv.appendChild(pkgDiv);
+            });
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'choice-btn';
+            backBtn.style.marginTop = '20px';
+            backBtn.innerHTML = '← Back';
+            backBtn.onclick = () => showMainChoices();
+            choicesDiv.appendChild(backBtn);
+        }
+
+        function buyVC(packageIndex) {
+            const pkg = vcPackages[packageIndex];
+            
+            gameState.budget -= pkg.cost;
+            gameState.moneySpent += pkg.cost;
+            gameState.vcOwned += pkg.vc;
+            gameState.overall += pkg.ovrGain;
+            gameState.vcPurchases++;
+            gameState.totalActions++;
+
+            if (gameState.overall > 99) gameState.overall = 99;
+
+            // Opponents also buy VC - scale based on package size
+            let opponentIncrease = Math.ceil(pkg.ovrGain * 0.3); // 30% of your gain
+            if (opponentIncrease < 1) opponentIncrease = 1; // Minimum 1
+            increaseOpponentOVR(opponentIncrease);
+
+            updateStats();
+
+            let message = `You purchased ${pkg.vc.toLocaleString()} VC for $${pkg.cost}! Your overall increased to ${gameState.overall}.`;
+            message += ` <div class="alert-box warning">⚠️ While you were buying VC, other players did too! Average opponent OVR increased by +${opponentIncrease} to ${gameState.avgOpponent}.</div>`;
+            
+            if (gameState.budget < 0 && !gameState.debtWarningShown) {
+                message += ` <div class="alert-box">💳 WARNING: You're now in debt! Be careful with your spending.</div>`;
+                gameState.debtWarningShown = true;
+            }
+
+            document.getElementById('storyText').innerHTML = message;
+
+            setTimeout(() => {
+                showFact();
+                setTimeout(() => showMainChoices(), 100);
+            }, 300);
+        }
+
+        function grindGames() {
+            const hoursGrinded = 5;
+            const vcEarned = hoursGrinded * 3000;
+            const ovrGain = hoursGrinded * 0.5;
+
+            gameState.hoursPlayed += hoursGrinded;
+            gameState.vcOwned += vcEarned;
+            gameState.overall += ovrGain;
+            gameState.grindSessions++;
+            gameState.totalActions++;
+            gameState.burnoutLevel += 15;
+            gameState.frustrationLevel += 10;
+
+            if (gameState.overall > 99) gameState.overall = 99;
+
+            // Opponents also improve slightly
+            increaseOpponentOVR(2);
+
+            updateStats();
+
+            let message = `You grinded for ${hoursGrinded} hours, earning ${vcEarned.toLocaleString()} VC. Your overall increased to ${gameState.overall}.`;
+            
+            if (gameState.frustrationLevel >= 30) {
+                message += ` <div class="alert-box warning">😤 The grind is tedious. You're getting frustrated with the slow progress.</div>`;
+            }
+
+            if (gameState.burnoutLevel >= 40) {
+                message += ` <div class="alert-box">😫 You're feeling burned out. This feels like a second job.</div>`;
+            }
+
+            document.getElementById('storyText').innerHTML = message;
+
+            setTimeout(() => {
+                if (Math.random() > 0.5) showFact();
+                setTimeout(() => showMainChoices(), 100);
+            }, 300);
+        }
+
+        function earnMoney() {
+            gameState.budget += 50;
+            gameState.workSessions++;
+            gameState.totalActions++;
+            gameState.hoursPlayed += 8; // Represents time spent working
+
+            // Other players level up significantly
+            increaseOpponentOVR(5);
+
+            updateStats();
+
+            let message = `You worked and earned $50! Your budget is now $${gameState.budget}.`;
+            message += ` <div class="alert-box">⚠️ While you were working, other players bought VC and leveled up. Average opponent overall is now ${gameState.avgOpponent}!</div>`;
+
+            document.getElementById('storyText').innerHTML = message;
+
+            setTimeout(() => {
+                showFact();
+                setTimeout(() => showMainChoices(), 100);
+            }, 300);
+        }
+
+        function evaluateJourney() {
+            const ovrDiff = gameState.avgOpponent - gameState.overall;
+            
+            // Determine ending based on stats
+            if (gameState.budget <= -100) {
+                endGame('debtSpiral');
+            } else if (gameState.burnoutLevel >= 60) {
+                endGame('burnedOut');
+            } else if (ovrDiff >= 15) {
+                endGame('behindCurve');
+            } else if (gameState.overall >= 90 && gameState.moneySpent <= 120) {
+                endGame('responsibleSpender');
+            } else if (gameState.overall >= 90 && gameState.moneySpent >= 250) {
+                endGame('payToWin');
+            } else if (gameState.overall >= 85 && gameState.hoursPlayed >= 60) {
+                endGame('heavyGrinder');
+            } else {
+                // Continue playing
+                let message = `<h3>📊 Progress Check</h3>`;
+                message += `<p>You're making progress, but there's still work to do. Your overall is ${gameState.overall}, while the average opponent is ${gameState.avgOpponent}.</p>`;
+                
+                if (ovrDiff > 10) {
+                    message += `<div class="alert-box warning">You're still behind the curve. Consider buying VC or grinding more.</div>`;
+                } else if (ovrDiff < 0) {
+                    message += `<div class="alert-box info">You're competitive! Keep it up or push for even higher ratings.</div>`;
+                }
+
+                document.getElementById('storyText').innerHTML = message;
+
+                const choicesDiv = document.getElementById('choices');
+                choicesDiv.innerHTML = '';
+
+                const continueBtn = document.createElement('button');
+                continueBtn.className = 'choice-btn';
+                continueBtn.innerHTML = '➡️ Keep Playing';
+                continueBtn.onclick = () => showMainChoices();
+                choicesDiv.appendChild(continueBtn);
+
+                const quitBtn = document.createElement('button');
+                quitBtn.className = 'choice-btn';
+                quitBtn.style.background = 'linear-gradient(135deg, #ee5a6f 0%, #c0392b 100%)';
+                quitBtn.innerHTML = '🏁 End Journey Here';
+                quitBtn.onclick = () => determineEnding();
+                choicesDiv.appendChild(quitBtn);
+            }
+        }
+
+        function determineEnding() {
+            const ovrDiff = gameState.avgOpponent - gameState.overall;
+            
+            if (gameState.budget <= -100) {
+                endGame('debtSpiral');
+            } else if (gameState.burnoutLevel >= 60) {
+                endGame('burnedOut');
+            } else if (ovrDiff >= 15) {
+                endGame('behindCurve');
+            } else if (gameState.overall >= 90 && gameState.moneySpent <= 150 && gameState.vcPurchases <= 3) {
+                endGame('responsibleSpender');
+            } else if (gameState.overall >= 90 && gameState.moneySpent >= 200) {
+                endGame('payToWin');
+            } else if (gameState.overall >= 85 && gameState.hoursPlayed >= 50 && gameState.vcPurchases <= 2) {
+                endGame('heavyGrinder');
+            } else if (gameState.overall >= 80 && gameState.overall < 90) {
+                endGame('middleGround');
+            } else {
+                endGame('casualPlayer');
+            }
+        }
+
+        const endings = {
+            responsibleSpender: {
+                title: "🎯 The Responsible Spender",
+                description: "You found the sweet spot. You spent some money but didn't go overboard. You're competitive and having fun without breaking the bank or burning yourself out."
+            },
+            heavyGrinder: {
+                title: "💪 The Heavy Grinder",
+                description: "You put in the hours and earned your rating through pure dedication. You resisted heavy spending but paid the price in time. You're proud of your accomplishment, but exhausted."
+            },
+            payToWin: {
+                title: "👑 The Pay-to-Win Dominator",
+                description: "You opened your wallet and dominated immediately. You're a high-level player with minimal grind time. The microtransaction system worked exactly as intended on you—you paid for convenience and power."
+            },
+            debtSpiral: {
+                title: "💳 The Debt Spiral",
+                description: "You spent money you didn't have, chasing upgrades to stay competitive. The game's psychological pressure pushed you into debt. You're competitive now, but at what real cost?"
+            },
+            burnedOut: {
+                title: "😫 The Burned-Out Player",
+                description: "The endless grind broke you. You tried to resist spending but the time investment destroyed your enjoyment. The game stopped being fun and became a chore. You're walking away exhausted."
+            },
+            behindCurve: {
+                title: "📉 Behind the Curve",
+                description: "Despite your efforts, you fell behind. Other players spent more money or time, and you couldn't keep up. You're frustrated and outmatched in every game. The competitive scene has left you in the dust."
+            },
+            middleGround: {
+                title: "⚖️ The Middle Ground",
+                description: "You're not the best, but you're not the worst. You spent some money, grinded some hours, and ended up reasonably competitive. You found an acceptable balance, even if it wasn't perfect."
+            },
+            casualPlayer: {
+                title: "🎮 The Casual Player",
+                description: "You played at your own pace without stressing about being the best. You spent modestly and didn't burn yourself out. You enjoyed the game on your terms, and that might be the healthiest outcome."
+            }
+        };
+
+        function endGame(endingId) {
+            const ending = endings[endingId];
+            
+            document.getElementById('storyText').innerHTML = `
+                <div class="ending">
+                    <h2>${ending.title}</h2>
+                    <p>${ending.description}</p>
+                    
+                    <div class="ending-stats">
+                        <h3>Final Statistics</h3>
+                        <div class="ending-stat-row">
+                            <span>Total Money Spent:</span>
+                            <span style="color: #ff6b35; font-weight: bold;">$${gameState.moneySpent}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>Final Budget:</span>
+                            <span style="color: ${gameState.budget < 0 ? '#ee5a6f' : '#26de81'}; font-weight: bold;">$${gameState.budget}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>VC Owned:</span>
+                            <span style="color: #ffd700; font-weight: bold;">${gameState.vcOwned.toLocaleString()}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>Final Overall:</span>
+                            <span style="color: #ff6b35; font-weight: bold;">${gameState.overall}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>Hours Played:</span>
+                            <span style="color: #6c5ce7; font-weight: bold;">${gameState.hoursPlayed}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>VC Purchases:</span>
+                            <span style="color: #ff6b35; font-weight: bold;">${gameState.vcPurchases}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>Grind Sessions:</span>
+                            <span style="color: #6c5ce7; font-weight: bold;">${gameState.grindSessions}</span>
+                        </div>
+                        <div class="ending-stat-row">
+                            <span>Work Sessions:</span>
+                            <span style="color: #26de81; font-weight: bold;">${gameState.workSessions}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = `
+                <button class="restart-btn" onclick="restartGame()">🔄 Play Again</button>
+            `;
+        }
+
+        function restartGame() {
+            gameState.budget = 130;
+            gameState.moneySpent = 70;
+            gameState.vcOwned = 0;
+            gameState.overall = 60;
+            gameState.avgOpponent = 75;
+            gameState.hoursPlayed = 0;
+            gameState.totalActions = 0;
+            gameState.grindSessions = 0;
+            gameState.vcPurchases = 0;
+            gameState.workSessions = 0;
+            gameState.burnoutLevel = 0;
+            gameState.frustrationLevel = 0;
+            gameState.debtWarningShown = false;
+            usedFacts = [];
+            
+            updateStats();
+            startGame();
+        }
+
+        function startGame() {
+            const storyText = `
+                <h3>Welcome to NBA 2K</h3>
+                <p>You started with a $200 budget. After buying NBA 2K for $70, you now have <strong>$130 remaining</strong>. After creating your MyPlayer, you're ready to hit the courts. But there's a problem...</p>
+                <div class="alert-box warning">
+                    ⚠️ Your MyPlayer is only 60 overall. Everyone in the Park is 75+, and you're getting destroyed.
+                </div>
+                <p>To upgrade your player and compete, you have three options:</p>
+                <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                    <li>💳 <strong>Buy VC</strong> with your remaining budget for instant upgrades</li>
+                    <li>🎮 <strong>Grind games</strong> to earn VC slowly (+0.5 OVR/hour, very time-consuming)</li>
+                    <li>💼 <strong>Earn money</strong> to increase your budget (+$50, but opponents level up +5 OVR)</li>
+                </ul>
+                <p style="margin-top: 15px;">What will you do? Every choice has consequences...</p>
+            `;
+
+            document.getElementById('storyText').innerHTML = storyText;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+
+            const startBtn = document.createElement('button');
+            startBtn.className = 'choice-btn';
+            startBtn.innerHTML = '🎮 Start Playing';
+            startBtn.onclick = () => showMainChoices();
+            choicesDiv.appendChild(startBtn);
+        }
+
+        // Initialize game
+        updateStats();
+        startGame();
+    </script>
+</body>
+</html>
